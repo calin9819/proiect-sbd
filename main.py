@@ -137,6 +137,70 @@ cursor.close()
 
 #cerinta 2
 
+#1
+projection = {"_id": 0,
+              "AN_FABRICATIE": 1,
+              "MARCA": 1,
+              "COMPONENTA": 1,
+              "PRET_MANOPERA": 1
+              }
+sort = [("MARCA", 1)]
+cursor = clienti_daune.find({}, projection=projection, sort=sort)
+df  = pd.DataFrame.from_dict(list(cursor))
+cursor.close()
+#pprint (df.loc[(df['AN_FABRICATIE'] < 2010) & (df['COMPONENTA'] =='BATTERY'), 'PRET_MANOPERA'])
+df.loc[(df['AN_FABRICATIE'] < 2010) & (df['COMPONENTA'] =='BATTERY'), 'PRET_MANOPERA']=df.loc[(df['AN_FABRICATIE'] < 2010) & (df['COMPONENTA'] =='BATTERY'), 'PRET_MANOPERA']*1.10
+#pprint(df.loc[(df['AN_FABRICATIE'] < 2010) & (df['COMPONENTA'] =='BATTERY'), 'PRET_MANOPERA'])
+
+#2
+projection={"_id":0,
+            "NUME_CLIENT":1,
+            "PROFESIA":1,
+            "VARSTA":1,
+            "SUMA_DEPOZIT":1}
+cursor = clienti_leasing.find({}, projection=projection)
+df = pd.DataFrame.from_dict(list(cursor))
+cursor.close()
+#pprint (df.loc[(df['PROFESIA'] =='Pensionar'), 'SUMA_DEPOZIT'])
+df.loc[(df['PROFESIA'] =='Pensionar'), 'SUMA_DEPOZIT']=df.loc[(df['PROFESIA'] =='Pensionar'), 'SUMA_DEPOZIT']*1.25
+#pprint(df.loc[(df['PROFESIA'] =='Pensionar'), 'SUMA_DEPOZIT'])
+
+#3
+projection={"_id":0,
+            "NUME_CLIENT":1,
+            "PROFESIA":1,
+            "VARSTA":1,
+            "SUMA_DEPOZIT":1}
+cursor = clienti_leasing.find({}, projection=projection)
+df = pd.DataFrame.from_dict(list(cursor))
+cursor.close()
+#pprint(df.loc[(df['NUME_CLIENT'] =='Harpa Constantin'), 'VARSTA'])
+df.loc[(df['NUME_CLIENT'] =='Harpa Constantin'), 'VARSTA']=df.loc[(df['NUME_CLIENT'] =='Harpa Constantin'), 'VARSTA']+1
+#pprint(df.loc[(df['NUME_CLIENT'] =='Harpa Constantin'), 'VARSTA'])
+
+#4
+projection={"_id":0,
+            "NUME_CLIENT":1,
+            "FIDELITATE":1,
+            "SUMA_DEPOZIT":1}
+cursor = clienti_leasing.find({}, projection=projection)
+df = pd.DataFrame.from_dict(list(cursor))
+cursor.close()
+#pprint(df.loc[(df['SUMA_DEPOZIT'] > 100), 'FIDELITATE'])
+df.loc[(df['SUMA_DEPOZIT'] > 100), 'FIDELITATE']=df.loc[(df['SUMA_DEPOZIT'] > 100), 'FIDELITATE']+1
+#pprint(df.loc[(df['SUMA_DEPOZIT'] > 100), 'FIDELITATE'])
+
+#5
+projection={"_id":0,
+            "NUME_CLIENT":1,
+            "PRESCORING":1,
+            "VARSTA":1}
+cursor = clienti_leasing.find({}, projection=projection)
+df = pd.DataFrame.from_dict(list(cursor))
+cursor.close()
+#pprint(df.loc[(df['VARSTA'] < 35), 'PRESCORING'])
+df.loc[(df['VARSTA'] < 35), 'PRESCORING']=6
+#pprint(df.loc[(df['VARSTA'] < 35), 'PRESCORING'])
 
 
 
