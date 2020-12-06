@@ -1,6 +1,11 @@
 import pymongo
 from pprint import pprint
 import pandas as pd
+import flask
+from flask import request, jsonify
+import json
+
+
 conn = pymongo.MongoClient("mongodb://master:stud1234@37.120.249.57:27017/?authSource=daune_leasing&authMechanism=SCRAM-SHA-256")
 db = conn["daune_leasing"]
 print(db.list_collection_names())
@@ -62,9 +67,11 @@ projection={"_id":0,
             "NUME_CLIENT":1,
             "PROFESIA":1,
             "SUMA_DEPOZIT":1}
-cursor=clienti_leasing.find({"SUMA_DEPOZIT": {"$gt": 10000}},projection=projection)
-set_clienti=list(cursor)
-#pprint (set_clienti)
+cursor=clienti_leasing.find({"SUMA_DEPOZIT": {"$gt": 100000}},projection=projection)
+set_clienti_depozit_100000=list(cursor)
+#print("Clienti Leasing cu depozitul mai mare de 100000 \n\n")
+#pprint(set_clienti_depozit_100000)
+#print("\n\nNumarul clientilor cu depozitul mai mare de 100000 este: ", len(set_clienti_depozit_100000))
 cursor.close()
 
 #cerinta 1 - agregari
@@ -203,6 +210,72 @@ df.loc[(df['VARSTA'] < 35), 'PRESCORING']=6
 #pprint(df.loc[(df['VARSTA'] < 35), 'PRESCORING'])
 
 
+#cerinta 3 => Returnarea rezultatului prelucrarii intr-o pagina Web (JSON)
+
+app = flask.Flask(__name__)
+app.config["DEBUG"] = False
+
+#home page
+
+@app.route('/', methods = ['GET'])
+
+def home() :
+    return  '''<h1>Regasirea clientilor cu leasing /h1>
+<p>API pentru afisarea clientilor</p>'''
+
+@app.errorhandler(404)
+
+def page_not_found(e):
+    return "<h1>404</h1><p> The requested route could not be accessed.</p>", 404
+
+
+# pagina: http://127.0.0.1:5000/api/clienti_leasing?depozit=100000
+
+@app.route('/api/clienti_leasing', methods=['GET'])
+def api_clienti_leasing():
+    # Verificarea parametrului introdus in URL.
+    if 'depozit' in request.args:
+        prag_depozit = int(request.args['depozit'])
+    else:
+        return "Error: Nu a fost precizata valoarea minima a depozitului pentru prelucrarea clientilor."
+
+
+# regasirea datelor din MongoDB
+
+    projection = {"_id": 0,
+                  "NUME_CLIENT": 1,
+                  "PROFESIA": 1,
+                  "SUMA_DEPOZIT": 1}
+
+    cursor=clienti_leasing.find({"SUMA_DEPOZIT": {"$gt": prag_depozit}},projection=projection)
+
+    dataframe_clienti = pd.DataFrame.from_dict(list(cursor))
+
+    cursor.close()
+
+    rezultate_json = json.loads(dataframe_clienti.to_json(orient='records'))
+
+    results_str = json.dumps(rezultate_json, sort_keys=True)
+
+    results_str = results_str[1:-1]
+
+
+    new_Data = ''
+    for client in results_str:
+        new_Data += client
+        new_Data += '\n'
+
+
+    print(new_Data)
+
+    return '''<h1>Regasirea clientilor cu leasing si valoarea depozitului mai mare de ''' + str(prag_depozit) + '''</h1><p>API pentru afisarea clientilor</p>''' + new_Data
+    #return jsonify(new_data)
+
+app.run()
+
+
+
+#cerinta 4 => Set de rapoarte pentru analiza colectiei MongoDB, utilizand PowerBI
 
 
 
