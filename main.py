@@ -129,7 +129,7 @@ pipeline=[{
 cursor=clienti_leasing.aggregate(pipeline)
 df = pd.DataFrame.from_dict(list(cursor))
 cursor.close()
-#pprint(df)
+# pprint(df)
 
 #5
 pipeline=[{'$group' : {
@@ -271,15 +271,89 @@ def api_clienti_leasing():
     return '''<h1>Regasirea clientilor cu leasing si valoarea depozitului mai mare de ''' + str(prag_depozit) + '''</h1><p>API pentru afisarea clientilor</p>''' + new_Data
     #return jsonify(new_data)
 
-app.run()
+#app.run()
 
 
 
 #cerinta 4 => Set de rapoarte pentru analiza colectiei MongoDB, utilizand PowerBI
 
 
+#Script #1
 
 
+# import pymongo
+# from pprint import pprint
+# import pandas as pd
+#
+# conn = pymongo.MongoClient("mongodb://master:stud1234@37.120.249.57:27017/?authSource=daune_leasing&authMechanism=SCRAM-SHA-256")
+# db = conn["daune_leasing"]
+#
+# clienti_leasing = db["clienti_leasing"]
+# clienti_daune = db["clienti_daune"]
+#
+# pipeline=[{'$group' : {
+#            "_id" : "$PROFESIA",
+#            "VAL_CREDIT_TOTAL": { "$sum": "$VAL_CREDITE_RON" }
+#             }},
+#         { '$sort': {"_id": 1}}]
+# cursor=clienti_leasing.aggregate(pipeline)
+# df = pd.DataFrame.from_dict(list(cursor))
+# cursor.close()
+# print(df)
 
+
+#Script #2
+
+
+# import pymongo
+# from pprint import pprint
+# import pandas as pd
+#
+# conn = pymongo.MongoClient("mongodb://master:stud1234@37.120.249.57:27017/?authSource=daune_leasing&authMechanism=SCRAM-SHA-256")
+# db = conn["daune_leasing"]
+#
+# clienti_leasing = db["clienti_leasing"]
+# clienti_daune = db["clienti_daune"]
+
+# pipeline=[{'$group' : {
+#            "_id" : "$PROFESIA",
+#             "VARSTA_MEDIE": { "$avg": "$VARSTA" }
+#             }},
+#         { '$sort': {"_id": 1}}]
+# cursor=clienti_leasing.aggregate(pipeline)
+# df = pd.DataFrame.from_dict(list(cursor))
+#
+# pprint(df)
+
+#Script #3
+
+
+# import pymongo
+# from pprint import pprint
+# import pandas as pd
+#
+# conn = pymongo.MongoClient("mongodb://master:stud1234@37.120.249.57:27017/?authSource=daune_leasing&authMechanism=SCRAM-SHA-256")
+# db = conn["daune_leasing"]
+#
+# clienti_leasing = db["clienti_leasing"]
+# clienti_daune = db["clienti_daune"]
+#
+# pipeline=[
+#     {
+#         "$bucket": {
+#             "groupBy": "$SUMA_SOLICITATA",
+#             "boundaries": [0, 1000, 5000, 10000, 20000, 50000],
+#             "default": "Other",
+#             "output": {
+#                 "Nr_total": { "$sum": 1 },
+#                 "Clienti leasing": { "$push": { "NUME_CLIENT": "$NUME_CLIENT", "MONEDA": "$MONEDA", "VARSTA": "$VARSTA", "SUMA_SOLICITATA": "$SUMA_SOLICITATA" } }
+#             }
+#         }
+#     }
+# ]
+# cursor=clienti_leasing.aggregate(pipeline)
+# df = pd.DataFrame.from_dict(list(cursor))
+# cursor.close()
+# print(df)
 
 
